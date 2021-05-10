@@ -1,3 +1,11 @@
+/*
+ * Nombre: Mario Soto
+ * Carne: 18351
+ * Laboratorio 6: Iniciando con tiva ware y code composer
+ */
+
+
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_types.h"
@@ -11,10 +19,13 @@ volatile uint32_t i;
 
 
 
-/**
- * main.c
- */
+
 int main(void)
 {
-	return 0;
+    SysCtlClockSet ( SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ ) ;//Hacemos la cofig del clck
+    SysCtlPeripheralEnable ( SYSCTL_PERIPH_GPIOF ) ;//Activamos el uso de perierios para el puerto F
+    // Setup de pines como salidas y de botones como entradas
+
+
+
 }
