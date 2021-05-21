@@ -1,7 +1,7 @@
 /*
  * Nombre: Mario Soto
  * Carnet: 18351
- * Laboratorio 7
+ * Proyecto 4 parte de code composer
  * Catedratico: Pablo Mazariegos
  * Seccion 20
  */
