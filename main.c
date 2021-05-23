@@ -40,21 +40,33 @@ int main(void)
 {
     SysCtlClockSet ( SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ ) ;//Hacemos la cofig del clck
     SysCtlPeripheralEnable ( SYSCTL_PERIPH_GPIOF ) ;//Activamos el uso de periferios para el puerto F
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);//Configuramos los leds rojo, verde y azul como salidas
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);//Se habilita el reloj para el temporizador
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);//Se configura al timer 0 como termporizador periodico
-    ui32Period = (SysCtlClockGet()) / 2;//Se calcula el periodo del temporizador
-    TimerLoadSet(TIMER0_BASE, TIMER_A, ui32Period - 1);//Se establece el periodo del temporizador
+
+    GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);//Configuramos los push buttoms como entradas
+
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2);//Configuramos los dos leds del parqueo 1 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_3|GPIO_PIN_4);//Configuramos los dos leds del parqueo 1 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 1 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 1 como salidas
+
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);//Se habilita el reloj para el temporizador
+//    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);//Se configura al timer 0 como termporizador periodico
+//    ui32Period = (SysCtlClockGet()) / 2;//Se calcula el periodo del temporizador
+//    TimerLoadSet(TIMER0_BASE, TIMER_A, ui32Period - 1);//Se establece el periodo del temporizador
 
 
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);//Se habilita el time out
-    TimerIntRegister(TIMER0_BASE,TIMER_A,Timer0IntHandler);
+//    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);//Se habilita el time out
+//    TimerIntRegister(TIMER0_BASE,TIMER_A,Timer0IntHandler);
 
     InitUART();
 
-    IntEnable(INT_TIMER0A);//Se habilita la interrupción en el timer 0
-    IntMasterEnable();//Se habilitan interrupciones globales
-    TimerEnable(TIMER0_BASE, TIMER_A);//Se habilita el timer
+//    IntEnable(INT_TIMER0A);//Se habilita la interrupción en el timer 0
+//    IntMasterEnable();//Se habilitan interrupciones globales
+//    TimerEnable(TIMER0_BASE, TIMER_A);//Se habilita el timer
 
 
 //    UARTCharPut(UART0_BASE, 'R');
@@ -63,7 +75,7 @@ int main(void)
 
     while (1)
     {
-        color = UARTCharGet(UART0_BASE);
+//        color = UARTCharGet(UART0_BASE);
 
 
     }
@@ -73,49 +85,49 @@ int main(void)
 }
 
 
-void Timer0IntHandler(void){
-    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);//Se limpia la interrupcion del timer
-
-    switch (color)
-    {
-    case 'r':
-        if (bandera == 0)
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x02); //Se enciende el led rojo
-            bandera = 1;
-        }
-        else
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
-            bandera = 0;
-        }
-        break;
-    case 'b':
-        if (bandera == 0)
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3,0x04);
-            bandera = 1;
-        }
-        else
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
-            bandera = 0;
-        }
-        break;
-    case 'g':
-        if (bandera == 0)
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3,0x08);
-            bandera = 1;
-        }
-        else
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
-            bandera = 0;
-        }
-        break;
-    }
-}
+//void Timer0IntHandler(void){
+//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);//Se limpia la interrupcion del timer
+//
+//    switch (color)
+//    {
+//    case 'r':
+//        if (bandera == 0)
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x02); //Se enciende el led rojo
+//            bandera = 1;
+//        }
+//        else
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
+//            bandera = 0;
+//        }
+//        break;
+//    case 'b':
+//        if (bandera == 0)
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3,0x04);
+//            bandera = 1;
+//        }
+//        else
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
+//            bandera = 0;
+//        }
+//        break;
+//    case 'g':
+//        if (bandera == 0)
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3,0x08);
+//            bandera = 1;
+//        }
+//       else
+//        {
+//            GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_3|GPIO_PIN_2|GPIO_PIN_1,0x00); //Se apagan todas las leds
+//            bandera = 0;
+//        }
+//        break;
+//    }
+//}
 
 void InitUART(void)
 {
