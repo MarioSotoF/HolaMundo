@@ -20,15 +20,21 @@
 #include "driverlib/timer.h"
 #include "driverlib/systick.h"
 #include "driverlib/uart.h"
+#include "driverlib/pin_map.h"
 
 #define XTAL 16000000
 
 uint32_t ui32Period;//Se incluye la variable para el temporizador
-uint8_t bandera = 0;
+
+uint8_t parqueo1 = 0;
+uint8_t parqueo2 = 0;
+uint8_t parqueo3 = 0;
+uint8_t parqueo4 = 0;
+
 int32_t color;
 
 //void InitUART(void);
-void Timer0IntHandler(void);
+//void Timer0IntHandler(void);
 void InitUART(void);
 
 
@@ -39,19 +45,26 @@ void InitUART(void);
 int main(void)
 {
     SysCtlClockSet ( SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ ) ;//Hacemos la cofig del clck
-    SysCtlPeripheralEnable ( SYSCTL_PERIPH_GPIOF ) ;//Activamos el uso de periferios para el puerto F
+    SysCtlPeripheralEnable ( SYSCTL_PERIPH_GPIOF|SYSCTL_PERIPH_GPIOD ) ;//Activamos el uso de periferios para el puerto F y D
 
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);//Configuramos los push buttoms como entradas
 
+    GPIOPinConfigure(GPIO_PD0_WT2CCP0);
+    GPIOPinConfigure(GPIO_PD1_WT2CCP1);
+    GPIOPinConfigure(GPIO_PD2_WT3CCP0);
+    GPIOPinConfigure(GPIO_PD3_WT3CCP1);
+
+    //Configuramos los push como pull up
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1|GPIO_PIN_2);//Configuramos los dos leds del parqueo 1 como salidas
-    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_3|GPIO_PIN_4);//Configuramos los dos leds del parqueo 1 como salidas
-    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 1 como salidas
-    GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 1 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_3|GPIO_PIN_4);//Configuramos los dos leds del parqueo 2 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 3 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_6|GPIO_PIN_7);//Configuramos los dos leds del parqueo 4 como salidas
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);//Configuramos los dos leds del parqueo 4 como salidas
 
 //    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);//Se habilita el reloj para el temporizador
 //    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);//Se configura al timer 0 como termporizador periodico
@@ -76,6 +89,31 @@ int main(void)
     while (1)
     {
 //        color = UARTCharGet(UART0_BASE);
+
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x02);
+        if (!GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_0))
+        {
+            SysCtlDelay(500000);
+            while (!GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_0))
+            {
+
+            }
+
+            if (parqueo1 == 0)
+            {
+                GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0xFF);//Led verde indicando que le parqueo esta libre
+                GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0x00);//Led roja apagada
+                SysCtlDelay(500000);
+                parqueo1 = 1;
+            }
+            else if(parqueo1 == 1)
+            {
+                GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0x00);//Led verde apagada
+                GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0xFF);//Led roja indicando que le parqueo esta ocuapo
+                SysCtlDelay(500000);
+                parqueo1 = 0;
+            }
+        }
 
 
     }
