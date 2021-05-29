@@ -25,6 +25,9 @@
 #define XTAL 16000000
 
 uint32_t ui32Period;//Se incluye la variable para el temporizador
+uint32_t i = 0;
+uint32_t j = 0;
+
 
 //lectura de los pines de los push
 int lectura;
@@ -33,10 +36,12 @@ int lectura2;
 int lectura3;
 int libres;
 
+
 //void InitUART(void);
 
 
-
+void delay(uint32_t msec);
+void delay1ms(void);
 
 
 /**
@@ -76,7 +81,17 @@ int main(void)
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);//Configuramos los push buttoms como pull up
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);//Configuramos los push buttoms como pull up
 
+    //Se configura la comunicacion UART
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);//Se habilita el UART1
+    GPIOPinConfigure(GPIO_PB0_U1RX);
+    GPIOPinConfigure(GPIO_PB1_U1TX);
+    GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 |GPIO_PIN_1); //definicion de los pines del UART1
+    UARTClockSourceSet(UART1_BASE, UART_CLOCK_PIOSC);
+    //Configuracion de UART0 a 115200 con 8 bits de datos y 1 de stop sin pariedad
+    UARTConfigSetExpClk(UART1_BASE, 16000000, 115200, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |UART_CONFIG_PAR_NONE));
 
+
+    UARTEnable(UART1_BASE);
 
 
 
@@ -89,7 +104,6 @@ int main(void)
         lectura1=GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_1);//Lectura para el parqueo 2
         lectura2=GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_2);//Lectura para el parqueo 3
         lectura3=GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_3);//Lectura para el parqueo 4
-//        libres = lectura + lectura1 + lectura2 + lectura3;
         libres = 4;
 
         if (lectura==0)
@@ -195,9 +209,38 @@ int main(void)
         {
 
         }
+        //Se envian datos por el UART
+        UARTCharPut(UART1_BASE, lectura);
+        UARTCharPut(UART1_BASE, lectura1);
+        UARTCharPut(UART1_BASE, lectura2);
+        UARTCharPut(UART1_BASE, lectura3);
+
+        delay(100);
 
     }
 
 
 
 }
+
+void delay(uint32_t msec)
+{
+    for (i = 0; i < msec; i++)
+    {
+        delay1ms();
+    }
+
+}
+
+void delay1ms(void)
+{
+    SysTickDisable();
+    SysTickPeriodSet(16000);
+    SysTickEnable();
+
+    while ((NVIC_ST_CTRL_R & NVIC_ST_CTRL_COUNT) == 0);
+}
+
+
+
+
